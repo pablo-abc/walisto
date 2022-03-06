@@ -4,6 +4,7 @@ import { AwesomeQR } from 'awesome-qr';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import type { FocusTrap } from 'focus-trap';
 import { createFocusTrap } from 'focus-trap';
+import { hideOthers } from 'aria-hidden';
 
 import './walisto-button';
 
@@ -108,6 +109,8 @@ export class WalistoModal extends LitElement {
 
   focusTrap?: FocusTrap;
 
+  hideUndo?: () => void;
+
   updated(changedProperties: Map<string, any>) {
     if (!this.backdropElement) return;
     if (!changedProperties.has('isOpen')) return;
@@ -116,12 +119,14 @@ export class WalistoModal extends LitElement {
       this.backdropElement.style.display = 'grid';
       document.addEventListener('keyup', this._handleKeyup);
       this.focusTrap.activate();
+      this.hideUndo = hideOthers(this);
       disableBodyScroll(this.backdropElement);
     } else {
       this.focusTrap.deactivate();
       this.backdropElement.style.display = 'none';
       document.removeEventListener('keyup', this._handleKeyup);
       enableBodyScroll(this.backdropElement);
+      this.hideUndo?.();
       if (this.initialFocusRef) this.initialFocusRef.focus();
     }
   }
@@ -154,6 +159,8 @@ export class WalistoModal extends LitElement {
     super.disconnectedCallback();
     this.close();
     this.removeEventListener('keyup', this._handleKeyup);
+    this.hideUndo?.();
+    this.focusTrap?.deactivate();
     if (this.backdropElement) enableBodyScroll(this.backdropElement);
   }
 
