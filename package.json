@@ -1,6 +1,6 @@
 {
   "name": "walisto",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A widget to display crypto addresses",
   "main": "dist/index.cjs",
   "module": "dist/esm/index.js",
@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "build": "rimraf dist && rollup -c",
+    "prepublishOnly": "pnpm build",
     "dev": "rollup -cw",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
