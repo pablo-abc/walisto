@@ -17,18 +17,7 @@ export class WalistoItem extends LitElement {
       --walisto-button-bg-hover: #777;
       --walisto-button-bg-active: #999;
       --walisto-outline-fv: 2px solid #07d;
-      display: block;
       color: var(--walisto-font-color);
-    }
-
-    div {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    #item {
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
@@ -36,6 +25,13 @@ export class WalistoItem extends LitElement {
       background: var(--walisto-item-bg);
       border-radius: 10px;
       line-height: 1.5rem;
+    }
+
+    div {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
     }
 
     #term {
@@ -125,10 +121,8 @@ export class WalistoItem extends LitElement {
 
   render() {
     return html`
-      <div id="item" part="item">
-        ${this._termTag(this.name)}
-        ${this._definitionTag(this._definitionContent())}
-      </div>
+      ${this._termTag(this.name)}
+      ${this._definitionTag(this._definitionContent())}
     `;
   }
 

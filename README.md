@@ -33,7 +33,6 @@ walisto-item {
 
 And you can style the following parts:
 
-* `item`: the main container of the item
 * `term`: the name of the currency
 * `definition`: the address and buttons
 * `address`: the address only
