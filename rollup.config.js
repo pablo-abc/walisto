@@ -7,6 +7,7 @@ import copy from 'rollup-plugin-copy';
 import serve from 'rollup-plugin-serve';
 import watch from 'rollup-plugin-watch';
 import livereload from 'rollup-plugin-livereload';
+import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
 const prod = !process.env.ROLLUP_WATCH;
@@ -21,6 +22,13 @@ export default {
       sourcemap: prod,
       exports: 'named',
       name: 'Walisto',
+    },
+    prod && {
+      file: 'dist/esm/index.min.js',
+      format: 'esm',
+      sourcemap: prod,
+      exports: 'named',
+      plugins: [terser()],
     },
     { file: pkg.module, format: 'esm', sourcemap: prod, exports: 'named' },
   ],

@@ -2,6 +2,15 @@
 
 A web component widget to list your crypto wallets
 
+## Installation
+
+You can use a CDN and add the followin to the `head` of your page:
+
+```html
+<!-- using unpkg -->
+<script type="module" src="https://unpkg.com/walisto@<VERSION>/dist/esm/index.js"></script>
+```
+
 ## Usage
 
 There's two components: `<walisto-container>` and `<walisto-item>`. `<walisto-container>` is only used fo styling and it is completely optional.
