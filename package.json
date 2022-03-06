@@ -14,6 +14,8 @@
   },
   "author": "Pablo Berganza <pablo@berganza.dev>",
   "license": "MIT",
+  "repository": "github:pablo-abc/walisto",
+  "homepage": "https://github.com/pablo-abc/walisto",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.2",
     "@rollup/plugin-node-resolve": "^13.1.3",
