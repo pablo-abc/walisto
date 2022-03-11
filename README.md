@@ -8,21 +8,21 @@ You can use a CDN and add the followin to the `head` of your page:
 
 ```html
 <!-- using unpkg -->
-<script type="module" src="https://unpkg.com/walisto@<VERSION>/dist/esm/index.js"></script>
+<script type="module" src="https://unpkg.com/walisto@<VERSION>/dist/index.min.js"></script>
 ```
 
 ## Usage
 
-There's two components: `<walisto-container>` and `<walisto-item>`. `<walisto-container>` is only used fo styling and it is completely optional.
+There's two components: `<walisto-container>` and `<walisto-item>`. `<walisto-container>` is only used for styling and it is completely optional.
 
 `<walisto-item>` accepts the following props:
 
-* `address`: The address to display
-* `name`: The name of the currency
+* `data-address`: The address to display
+* `data-name`: The name of the currency
 
 ```html
 <walisto-container>
-  <walisto-item name="BTC" address="testaddress"></walisto-item>
+  <walisto-item data-name="BTC" data-address="testaddress"></walisto-item>
 </walisto-container>
 ```
 
