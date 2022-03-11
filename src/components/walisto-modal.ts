@@ -1,7 +1,11 @@
 import { controller, attr, target } from '@github/catalyst';
 import { html, render } from '@github/jtml';
 import { AwesomeQR } from 'awesome-qr';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import {
+  disableBodyScroll,
+  enableBodyScroll,
+  clearAllBodyScrollLocks,
+} from 'body-scroll-lock';
 import type { FocusTrap } from 'focus-trap';
 import { createFocusTrap } from 'focus-trap';
 import { hideOthers } from 'aria-hidden';
@@ -20,6 +24,13 @@ export class WalistoModalElement extends HTMLElement {
 
   open() {
     this.isOpen = true;
+    const scrollY = window.scrollY;
+    const scrollX = window.scrollX;
+    requestAnimationFrame(() => {
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = `-${scrollX}px`;
+    });
     this.backdrop.style.display = 'grid';
     document.addEventListener('keyup', this._handleKeyup);
     this.focusTrap?.activate();
@@ -29,12 +40,21 @@ export class WalistoModalElement extends HTMLElement {
 
   close() {
     this.isOpen = false;
+    requestAnimationFrame(() => {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    });
     this.focusTrap?.deactivate();
     this.backdrop.style.display = 'none';
     document.removeEventListener('keyup', this._handleKeyup);
     enableBodyScroll(this.backdrop);
     this.hideUndo?.();
-    if (this.initialFocusRef) this.initialFocusRef.focus();
+    const initialFocusRef = this.initialFocusRef;
+    if (initialFocusRef) {
+      initialFocusRef.focus();
+    }
   }
 
   imgSrc?: string;
@@ -79,7 +99,7 @@ export class WalistoModalElement extends HTMLElement {
     this.removeEventListener('keyup', this._handleKeyup);
     this.hideUndo?.();
     this.focusTrap?.deactivate();
-    if (this.backdrop) enableBodyScroll(this.backdrop);
+    clearAllBodyScrollLocks();
   }
 
   update() {
