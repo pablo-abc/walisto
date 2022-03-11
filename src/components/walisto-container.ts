@@ -1,10 +1,21 @@
-import { controller } from '@github/catalyst';
+import { controller, target } from '@github/catalyst';
 import { html, render } from '@github/jtml';
 
 @controller
 export class WalistoContainerElement extends HTMLElement {
-  connectedCallback() {
-    this.attachShadow({ mode: 'open' });
+  @target dl!: HTMLDListElement;
+
+  get template() {
+    const template = this.dl
+      .querySelector('slot')!
+      .assignedElements()
+      .find((el) => el instanceof HTMLTemplateElement) as HTMLTemplateElement;
+    return template;
+  }
+
+  content?: DocumentFragment;
+
+  update() {
     render(
       html`
         <style>
@@ -16,7 +27,7 @@ export class WalistoContainerElement extends HTMLElement {
             display: block;
           }
 
-          .container ::slotted(walisto-item:not(:first-child)) {
+          .container walisto-item:not(:first-child) {
             margin-top: var(--walisto-item-gap);
           }
 
@@ -25,12 +36,20 @@ export class WalistoContainerElement extends HTMLElement {
             max-width: var(--walisto-width);
           }
         </style>
-        <dl class="container">
+        <dl class="container" data-target="walisto-container.dl">
           <slot></slot>
+          ${this.content}
         </dl>
       `,
       this.shadowRoot!
     );
+  }
+
+  connectedCallback() {
+    this.attachShadow({ mode: 'open' });
+    this.update();
+    this.content = document.importNode(this.template.content, true);
+    this.update();
   }
 }
 
