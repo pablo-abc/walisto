@@ -1,5 +1,3 @@
-import type { TemplateResult } from '@github/jtml';
-import { html, render } from '@github/jtml';
 import { controller, attr } from '@github/catalyst';
 
 import './walisto-copy-button';
@@ -26,18 +24,23 @@ export class WalistoItemElement extends HTMLElement {
 
   private _termTag(children?: string) {
     if (this.inContainer)
-      return html`<dt part="term" id="term">${children}</dt>`;
-    else return html`<div part="term" id="term">${children}</div>`;
+      return /* HTML */ `<dt part="term" id="term">${children}</dt>`;
+    else return /* HTML */ `<div part="term" id="term">${children}</div>`;
   }
 
-  private _definitionTag(children?: TemplateResult) {
+  private _definitionTag(children?: string) {
     if (this.inContainer)
-      return html`<dd part="definition" id="definition">${children}</dd>`;
-    else return html`<div part="definition" id="definition">${children}</div>`;
+      return /* HTML */ `<dd part="definition" id="definition">
+        ${children}
+      </dd>`;
+    else
+      return /* HTML */ `<div part="definition" id="definition">
+        ${children}
+      </div>`;
   }
 
   private _definitionContent() {
-    return html`
+    return /* HTML */ `
       <span part="address" id="address">${this.address}</span>
       <div id="buttons" part="buttons">
         <walisto-copy-button
@@ -57,79 +60,79 @@ export class WalistoItemElement extends HTMLElement {
     `;
   }
 
-  update() {
-    render(
-      html`
-        <style>
-          :host {
-            --walisto-item-bg: #222;
-            --walisto-font-color: #ddd;
-            --walisto-button-font-color: var(--walisto-font-color);
-            --walisto-button-bg: #555;
-            --walisto-button-bg-hover: #777;
-            --walisto-button-bg-active: #999;
-            --walisto-outline-fv: 2px solid #07d;
-            color: var(--walisto-font-color);
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            align-items: center;
-            background: var(--walisto-item-bg);
-            border-radius: 10px;
-            line-height: 1.5rem;
-          }
+  get template() {
+    const template = document.createElement('template');
+    template.innerHTML = /* HTML */ `
+      <style>
+        :host {
+          --walisto-item-bg: #222;
+          --walisto-font-color: #ddd;
+          --walisto-button-font-color: var(--walisto-font-color);
+          --walisto-button-bg: #555;
+          --walisto-button-bg-hover: #777;
+          --walisto-button-bg-active: #999;
+          --walisto-outline-fv: 2px solid #07d;
+          color: var(--walisto-font-color);
+          display: flex;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          align-items: center;
+          background: var(--walisto-item-bg);
+          border-radius: 10px;
+          line-height: 1.5rem;
+        }
 
-          div {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-          }
+        div {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+        }
 
-          #term {
-            font-weight: 700;
-            margin: 0;
-            padding: 0.5rem 1rem;
-          }
+        #term {
+          font-weight: 700;
+          margin: 0;
+          padding: 0.5rem 1rem;
+        }
 
-          #definition {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            overflow: hidden;
-            margin: 0;
-            margin-left: 1rem;
-          }
+        #definition {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          overflow: hidden;
+          margin: 0;
+          margin-left: 1rem;
+        }
 
-          #address {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 0.5rem 1rem;
-            font-size: 0.875em;
-            opacity: 0.7;
-          }
+        #address {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding: 0.5rem 1rem;
+          font-size: 0.875em;
+          opacity: 0.7;
+        }
 
-          #buttons {
-            margin-left: auto;
-            padding: 0.5rem 1rem;
-          }
+        #buttons {
+          margin-left: auto;
+          padding: 0.5rem 1rem;
+        }
 
-          #buttons > walisto-copy-button {
-            margin-right: 0.5rem;
-          }
-        </style>
-        ${this._termTag(this.name)}
-        ${this._definitionTag(this._definitionContent())}
-      `,
-      this.shadowRoot!
-    );
+        #buttons > walisto-copy-button {
+          margin-right: 0.5rem;
+        }
+      </style>
+      ${this._termTag(this.name)}
+      ${this._definitionTag(this._definitionContent())}
+    `;
+    return template;
   }
 
   connectedCallback() {
     this.attachShadow({ mode: 'open' });
     this.inContainer = !!this.closest('dl');
     this.setAttribute('role', this.inContainer ? 'presentation' : 'group');
-    this.update();
+    const content = document.importNode(this.template.content, true);
+    this.shadowRoot?.appendChild(content);
   }
 }
 

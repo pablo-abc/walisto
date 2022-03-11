@@ -1,5 +1,30 @@
 import { controller, target } from '@github/catalyst';
-import { html, render } from '@github/jtml';
+
+const template = document.createElement('template');
+
+template.innerHTML = /* HTML */ `
+  <style>
+    :host {
+      --walisto-font-family: monospace;
+      --walisto-width: 40rem;
+      --walisto-item-gap: 0.5rem;
+      font-family: var(--walisto-font-family);
+      display: block;
+    }
+
+    .container walisto-item:not(:first-child) {
+      margin-top: var(--walisto-item-gap);
+    }
+
+    .container {
+      margin: 0;
+      max-width: var(--walisto-width);
+    }
+  </style>
+  <dl class="container" data-target="walisto-container.dl">
+    <slot></slot>
+  </dl>
+`;
 
 @controller
 export class WalistoContainerElement extends HTMLElement {
@@ -13,43 +38,12 @@ export class WalistoContainerElement extends HTMLElement {
     return template;
   }
 
-  content?: DocumentFragment;
-
-  update() {
-    render(
-      html`
-        <style>
-          :host {
-            --walisto-font-family: monospace;
-            --walisto-width: 40rem;
-            --walisto-item-gap: 0.5rem;
-            font-family: var(--walisto-font-family);
-            display: block;
-          }
-
-          .container walisto-item:not(:first-child) {
-            margin-top: var(--walisto-item-gap);
-          }
-
-          .container {
-            margin: 0;
-            max-width: var(--walisto-width);
-          }
-        </style>
-        <dl class="container" data-target="walisto-container.dl">
-          <slot></slot>
-          ${this.content}
-        </dl>
-      `,
-      this.shadowRoot!
-    );
-  }
-
   connectedCallback() {
     this.attachShadow({ mode: 'open' });
-    this.update();
-    this.content = document.importNode(this.template.content, true);
-    this.update();
+    const content = document.importNode(template.content, true);
+    this.shadowRoot?.appendChild(content);
+    const dlContent = document.importNode(this.template.content, true);
+    this.dl.appendChild(dlContent);
   }
 }
 

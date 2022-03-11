@@ -1,10 +1,38 @@
 import { controller, attr, target } from '@github/catalyst';
-import { html, render } from '@github/jtml';
 
 import './walisto-button';
 
+const template = document.createElement('template');
+
+template.innerHTML = /* HTML */ `
+  <style>
+    .success {
+      --walisto-button-font-color: #6d3;
+    }
+
+    #copy-button svg {
+      height: 1.3rem;
+    }
+  </style>
+  <walisto-button data-target="walisto-copy-button.walistoButton">
+    <button
+      type="button"
+      data-action="click:walisto-copy-button#copyAddress"
+      id="copy-button"
+      part="button"
+      data-target="walisto-copy-button.button"
+    ></button>
+  </walisto-button>
+`;
+
 @controller
 export class WalistoCopyButtonElement extends HTMLElement {
+  @target
+  walistoButton!: HTMLElement;
+
+  @target
+  button!: HTMLButtonElement;
+
   @attr
   label = '';
 
@@ -15,8 +43,9 @@ export class WalistoCopyButtonElement extends HTMLElement {
 
   private _renderContent() {
     if (this.copied) {
-      return html`
+      return /* HTML */ `
         <svg
+          aria-hidden="true"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -31,8 +60,9 @@ export class WalistoCopyButtonElement extends HTMLElement {
         </svg>
       `;
     }
-    return html`
+    return /* HTML */ `
       <svg
+        aria-hidden="true"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -50,50 +80,26 @@ export class WalistoCopyButtonElement extends HTMLElement {
 
   update() {
     const label = this.label || 'Copy to clipboard';
-    render(
-      html`
-        <style>
-          .success {
-            --walisto-button-font-color: #6d3;
-          }
-
-          #copy-button svg {
-            height: 1.3rem;
-          }
-        </style>
-        <walisto-button data-target="walisto-copy-button.button">
-          <button
-            type="button"
-            data-action="click:walisto-copy-button#copyAddress"
-            aria-label="${label}"
-            title="${label}"
-            id="copy-button"
-            part="button"
-          >
-            ${this._renderContent()}
-          </button>
-        </walisto-button>
-      `,
-      this.shadowRoot!
-    );
+    this.button.setAttribute('aria-label', label);
+    this.button.setAttribute('title', label);
+    this.button.innerHTML = this._renderContent();
   }
 
   connectedCallback() {
     this.attachShadow({ mode: 'open' });
+    const content = document.importNode(template.content, true);
+    this.shadowRoot?.appendChild(content);
     this.update();
   }
-
-  @target
-  button!: HTMLElement;
 
   copyAddress() {
     if (!this.address) return;
     navigator.clipboard.writeText(this.address);
     this.copied = true;
-    this.button.classList.add('success');
+    this.walistoButton.classList.add('success');
     this.update();
     setTimeout(() => {
-      this.button.classList.remove('success');
+      this.walistoButton.classList.remove('success');
       this.copied = false;
       this.update();
     }, 500);
