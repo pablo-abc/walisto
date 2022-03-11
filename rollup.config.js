@@ -16,19 +16,19 @@ const watching = process.env.ROLLUP_WATCH === 'true';
 export default {
   input: './src/index.ts',
   output: [
-    {
-      file: pkg.main,
-      format: 'umd',
-      sourcemap: prod,
-      exports: 'named',
-      name: 'Walisto',
-    },
     prod && {
-      file: 'dist/esm/index.min.js',
+      file: 'dist/index.min.js',
       format: 'esm',
       sourcemap: prod,
       exports: 'named',
-      plugins: [terser()],
+      plugins: [
+        terser({
+          mangle: {
+            keep_classnames: true,
+          },
+        }),
+        bundleSize(),
+      ],
     },
     { file: pkg.module, format: 'esm', sourcemap: prod, exports: 'named' },
   ],
@@ -53,6 +53,5 @@ export default {
         contentBase: 'dist',
       }),
     watching && livereload(),
-    prod && bundleSize(),
   ],
 };

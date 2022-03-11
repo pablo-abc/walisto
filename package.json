@@ -1,10 +1,10 @@
 {
   "name": "walisto",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A widget to display crypto addresses",
-  "main": "dist/index.cjs",
-  "module": "dist/esm/index.js",
-  "browser": "dist/esm/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "browser": "dist/index.js",
   "type": "module",
   "scripts": {
     "build": "rimraf dist && rollup -c",
@@ -44,11 +44,7 @@
     "focus-trap": "^6.7.3"
   },
   "exports": {
-    ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/index.cjs",
-      "default": "./dist/esm/index.js"
-    },
+    ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
   "volta": {
