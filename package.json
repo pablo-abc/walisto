@@ -1,6 +1,6 @@
 {
   "name": "walisto",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "A widget to display crypto addresses",
   "main": "dist/index.cjs",
   "module": "dist/esm/index.js",
@@ -36,11 +36,12 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
+    "@github/catalyst": "^1.3.0",
+    "@github/jtml": "^0.4.1",
     "aria-hidden": "^1.1.3",
     "awesome-qr": "^2.1.5-rc.0",
     "body-scroll-lock": "^4.0.0-beta.0",
-    "focus-trap": "^6.7.3",
-    "lit": "^2.2.0"
+    "focus-trap": "^6.7.3"
   },
   "exports": {
     ".": {

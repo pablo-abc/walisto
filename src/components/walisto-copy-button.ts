@@ -1,28 +1,17 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { controller, attr, target } from '@github/catalyst';
+import { html, render } from '@github/jtml';
 
 import './walisto-button';
 
-@customElement('walisto-copy-button')
-export class WalistoCopyButton extends LitElement {
-  static styles = css`
-    .success {
-      --walisto-button-font-color: #6d3;
-    }
+@controller
+export class WalistoCopyButtonElement extends HTMLElement {
+  @attr
+  label = '';
 
-    #copy-button svg {
-      height: 1.3rem;
-    }
-  `;
+  @attr
+  address = '';
 
-  @property()
-  label?: string;
-
-  @property()
-  address?: string;
-
-  @state()
-  copied?: boolean = false;
+  copied = false;
 
   private _renderContent() {
     if (this.copied) {
@@ -59,36 +48,54 @@ export class WalistoCopyButton extends LitElement {
     `;
   }
 
-  // Render the UI as a function of component state
-  render() {
+  update() {
     const label = this.label || 'Copy to clipboard';
-    return html`
-      <walisto-button>
-        <button
-          type="button"
-          @click=${this._copyAddress}
-          aria-label=${label}
-          title=${label}
-          id="copy-button"
-          part="button"
-        >
-          ${this._renderContent()}
-        </button>
-      </walisto-button>
-    `;
+    render(
+      html`
+        <style>
+          .success {
+            --walisto-button-font-color: #6d3;
+          }
+
+          #copy-button svg {
+            height: 1.3rem;
+          }
+        </style>
+        <walisto-button data-target="walisto-copy-button.button">
+          <button
+            type="button"
+            data-action="click:walisto-copy-button#copyAddress"
+            aria-label="${label}"
+            title="${label}"
+            id="copy-button"
+            part="button"
+          >
+            ${this._renderContent()}
+          </button>
+        </walisto-button>
+      `,
+      this.shadowRoot!
+    );
   }
 
-  @query('walisto-button')
-  buttonElement?: HTMLElement;
+  connectedCallback() {
+    this.attachShadow({ mode: 'open' });
+    this.update();
+  }
 
-  private _copyAddress() {
+  @target
+  button!: HTMLElement;
+
+  copyAddress() {
     if (!this.address) return;
     navigator.clipboard.writeText(this.address);
     this.copied = true;
-    this.buttonElement?.classList.add('success');
+    this.button.classList.add('success');
+    this.update();
     setTimeout(() => {
-      this.buttonElement?.classList.remove('success');
+      this.button.classList.remove('success');
       this.copied = false;
+      this.update();
     }, 500);
   }
 }

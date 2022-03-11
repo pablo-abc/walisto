@@ -1,33 +1,19 @@
-import type { WalistoModal } from './walisto-modal';
-import { LitElement, css, html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import type { WalistoModalElement } from './walisto-modal';
+import { controller, attr, target } from '@github/catalyst';
+import { html, render } from '@github/jtml';
 
 import './walisto-modal';
 import './walisto-button';
 
-@customElement('walisto-qr-button')
-export class WalistoQrButton extends LitElement {
-  static styles = css`
-    .success {
-      --walisto-button-font-color: #6d3;
-    }
+@controller
+export class WalistoQrButtonElement extends HTMLElement {
+  @attr label = '';
 
-    #qr-button svg {
-      height: 1.3rem;
-    }
-  `;
+  @attr name = '';
 
-  @property()
-  label?: string;
+  @attr address = '';
 
-  @property()
-  name?: string;
-
-  @property()
-  address?: string;
-
-  @property({ attribute: 'close-label' })
-  closeLabel?: string;
+  @attr closeLabel = '';
 
   private _renderContent() {
     return html`
@@ -47,44 +33,57 @@ export class WalistoQrButton extends LitElement {
     `;
   }
 
-  render() {
+  update() {
     const label = this.label || 'Show QR code';
-    return html`
-      <walisto-button label=${this.label || 'Show QR code'}>
-        <button
-          part="button"
-          id="qr-button"
-          @click=${this._openModal}
-          type="button"
-          aria-label=${label}
-          title=${label}
-        >
-          ${this._renderContent()}
-        </button>
-      </walisto-button>
-    `;
+    render(
+      html`
+        <style>
+          .success {
+            --walisto-button-font-color: #6d3;
+          }
+
+          #qr-button svg {
+            height: 1.3rem;
+          }
+        </style>
+        <walisto-button data-target="walisto-qr-button.button">
+          <button
+            part="button"
+            id="qr-button"
+            type="button"
+            aria-label="${label}"
+            title="${label}"
+            data-action="click:walisto-qr-button#openModal"
+          >
+            ${this._renderContent()}
+          </button>
+        </walisto-button>
+      `,
+      this.shadowRoot!
+    );
   }
 
-  @query('walisto-button')
-  buttonElement?: LitElement;
+  @target
+  button!: HTMLElement;
 
-  modal?: WalistoModal;
+  modal?: WalistoModalElement;
 
   connectedCallback() {
-    super.connectedCallback();
+    this.attachShadow({ mode: 'open' });
+    this.update();
     if (!this.address || !this.name) return;
     if (this.modal) return;
     const modalElement = document.createElement('walisto-modal');
-    modalElement.setAttribute('address', this.address);
-    modalElement.setAttribute('name', this.name);
+    modalElement.setAttribute('data-address', this.address);
+    modalElement.setAttribute('data-name', this.name);
     if (this.closeLabel) modalElement.closeLabel = this.closeLabel;
     document.body.appendChild(modalElement);
     this.modal = modalElement;
   }
 
-  private _openModal() {
+  openModal() {
     if (!this.modal) return;
-    this.modal.initialFocusRef = this.buttonElement?.querySelector('button');
+    this.modal.initialFocusRef = this.button.querySelector('button');
     this.modal.open();
   }
 }
