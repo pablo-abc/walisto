@@ -127,7 +127,7 @@ export class WalistoItemElement extends HTMLElement {
 
   connectedCallback() {
     this.attachShadow({ mode: 'open' });
-    this.inContainer = !!this.closest('walisto-container');
+    this.inContainer = !!this.closest('dl');
     this.setAttribute('role', this.inContainer ? 'presentation' : 'group');
     this.update();
   }

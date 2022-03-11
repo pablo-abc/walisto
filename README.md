@@ -22,9 +22,13 @@ There's two components: `<walisto-container>` and `<walisto-item>`. `<walisto-co
 
 ```html
 <walisto-container>
-  <walisto-item data-name="BTC" data-address="testaddress"></walisto-item>
+  <template>
+    <walisto-item part="item" data-name="BTC" data-address="testaddress"></walisto-item>
+  </template>
 </walisto-container>
 ```
+
+> **NOTE**: You can add a `part` attribute to whatever you have in the template to style it.
 
 The following CSS custom properties can be overriden on `<walisto-item>`:
 

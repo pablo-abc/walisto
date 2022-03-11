@@ -23,9 +23,7 @@ export default {
       exports: 'named',
       plugins: [
         terser({
-          mangle: {
-            keep_classnames: true,
-          },
+          keep_classnames: /Element$/,
         }),
         bundleSize(),
       ],
