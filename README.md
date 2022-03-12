@@ -17,14 +17,14 @@ There's two components: `<walisto-container>` and `<walisto-item>`. `<walisto-co
 
 `<walisto-item>` accepts the following props:
 
-* `data-address`: The address to display
-* `data-name`: The name of the currency
+* `address`: The address to display
+* `name`: The name of the currency
 
 ```html
 <walisto-container>
   <template>
-    <walisto-item part="item" data-name="BTC" data-address="testbtcaddress"></walisto-item>
-    <walisto-item part="item" data-name="ETH" data-address="testethaddress"></walisto-item>
+    <walisto-item part="item" name="BTC" address="testbtcaddress"></walisto-item>
+    <walisto-item part="item" name="ETH" address="testethaddress"></walisto-item>
   </template>
 </walisto-container>
 ```
