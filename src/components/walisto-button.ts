@@ -1,5 +1,3 @@
-import { controller } from '@github/catalyst';
-
 const template = document.createElement('template');
 
 template.innerHTML = /* HTML */ `
@@ -31,7 +29,6 @@ template.innerHTML = /* HTML */ `
   <slot></slot>
 `;
 
-@controller
 export class WalistoButtonElement extends HTMLElement {
   connectedCallback() {
     this.attachShadow({ mode: 'open' });
@@ -39,3 +36,5 @@ export class WalistoButtonElement extends HTMLElement {
     this.shadowRoot?.appendChild(content);
   }
 }
+
+customElements.define('walisto-button', WalistoButtonElement);

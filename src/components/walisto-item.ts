@@ -1,34 +1,46 @@
-import { controller, attr } from '@github/catalyst';
-
 import './walisto-copy-button';
 import './walisto-qr-button';
 
-@controller
 export class WalistoItemElement extends HTMLElement {
-  @attr
+  [key: string]: unknown;
+
   name = '';
 
-  @attr
   address = '';
 
-  @attr
   qrLabel = '';
 
-  @attr
   copyLabel = '';
 
-  @attr
   modalCloseLabel = '';
+
+  static get observedAttributes() {
+    return ['name', 'address', 'qr-label', 'copy-label', 'modal-close-label'];
+  }
+
+  static attributeMap: { [key: string]: string } = {
+    name: 'name',
+    address: 'address',
+    'qr-label': 'qrLabel',
+    'copy-label': 'copyLabel',
+    'modal-close-label': 'modalCloseLabel',
+  };
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (oldValue === newValue) return;
+    const attributeMap = WalistoItemElement.attributeMap;
+    this[attributeMap[name]] = newValue;
+  }
 
   inContainer?: boolean = false;
 
-  private _termTag(children?: string) {
+  #termTag(children?: string) {
     if (this.inContainer)
       return /* HTML */ `<dt part="term" id="term">${children}</dt>`;
     else return /* HTML */ `<div part="term" id="term">${children}</div>`;
   }
 
-  private _definitionTag(children?: string) {
+  #definitionTag(children?: string) {
     if (this.inContainer)
       return /* HTML */ `<dd part="definition" id="definition">
         ${children}
@@ -39,7 +51,7 @@ export class WalistoItemElement extends HTMLElement {
       </div>`;
   }
 
-  private _definitionContent() {
+  #definitionContent() {
     return /* HTML */ `
       <span part="address" id="address">${this.address}</span>
       <div id="buttons" part="buttons">
@@ -121,8 +133,8 @@ export class WalistoItemElement extends HTMLElement {
           margin-right: 0.5rem;
         }
       </style>
-      ${this._termTag(this.name)}
-      ${this._definitionTag(this._definitionContent())}
+      ${this.#termTag(this.name)}
+      ${this.#definitionTag(this.#definitionContent())}
     `;
     return template;
   }
@@ -135,6 +147,8 @@ export class WalistoItemElement extends HTMLElement {
     this.shadowRoot?.appendChild(content);
   }
 }
+
+customElements.define('walisto-item', WalistoItemElement);
 
 declare global {
   interface HTMLElementTagNameMap {

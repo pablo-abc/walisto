@@ -23,7 +23,8 @@ There's two components: `<walisto-container>` and `<walisto-item>`. `<walisto-co
 ```html
 <walisto-container>
   <template>
-    <walisto-item part="item" data-name="BTC" data-address="testaddress"></walisto-item>
+    <walisto-item part="item" data-name="BTC" data-address="testbtcaddress"></walisto-item>
+    <walisto-item part="item" data-name="ETH" data-address="testethaddress"></walisto-item>
   </template>
 </walisto-container>
 ```

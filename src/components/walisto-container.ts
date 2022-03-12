@@ -1,5 +1,3 @@
-import { controller, target } from '@github/catalyst';
-
 const template = document.createElement('template');
 
 template.innerHTML = /* HTML */ `
@@ -26,9 +24,10 @@ template.innerHTML = /* HTML */ `
   </dl>
 `;
 
-@controller
 export class WalistoContainerElement extends HTMLElement {
-  @target dl!: HTMLDListElement;
+  get dl() {
+    return this.shadowRoot?.querySelector('dl') as HTMLDListElement;
+  }
 
   get template() {
     const template = this.dl
@@ -46,6 +45,8 @@ export class WalistoContainerElement extends HTMLElement {
     this.dl.appendChild(dlContent);
   }
 }
+
+customElements.define('walisto-container', WalistoContainerElement);
 
 declare global {
   interface HTMLElementTagNameMap {
