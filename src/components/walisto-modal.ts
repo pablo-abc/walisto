@@ -147,19 +147,19 @@ export class WalistoModalElement extends HTMLElement {
   open() {
     this.isOpen = true;
     this.backdrop.style.display = 'grid';
-    document.addEventListener('keyup', this._handleKeyup);
-    this.focusTrap?.activate();
-    this.hideUndo = hideOthers(this);
+    document.addEventListener('keyup', this.#handleKeyup);
+    this.#focusTrap?.activate();
+    this.#hideUndo = hideOthers(this);
     disableBodyScroll(this.backdrop);
   }
 
   close() {
     this.isOpen = false;
-    this.focusTrap?.deactivate();
+    this.#focusTrap?.deactivate();
     this.backdrop.style.display = 'none';
-    document.removeEventListener('keyup', this._handleKeyup);
+    document.removeEventListener('keyup', this.#handleKeyup);
     enableBodyScroll(this.backdrop);
-    this.hideUndo?.();
+    this.#hideUndo?.();
     const initialFocusRef = this.initialFocusRef;
     if (initialFocusRef) {
       requestAnimationFrame(() => {
@@ -169,15 +169,13 @@ export class WalistoModalElement extends HTMLElement {
     }
   }
 
-  imgSrc?: string;
-
   isOpen = false;
 
-  focusTrap?: FocusTrap;
+  #focusTrap?: FocusTrap;
 
-  hideUndo?: () => void;
+  #hideUndo?: () => void;
 
-  private _handleKeyup = (e: KeyboardEvent) => {
+  #handleKeyup = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       e.preventDefault();
       this.close();
@@ -194,7 +192,7 @@ export class WalistoModalElement extends HTMLElement {
     const content = document.importNode(template.content, true);
     this.shadowRoot?.appendChild(content);
     this.update();
-    if (!this.focusTrap) this.focusTrap = createFocusTrap(this.backdrop);
+    if (!this.#focusTrap) this.#focusTrap = createFocusTrap(this.backdrop);
     new AwesomeQR({
       text: this.address,
       size: 500,
@@ -207,9 +205,9 @@ export class WalistoModalElement extends HTMLElement {
 
   disconnectedCallback() {
     this.close();
-    this.removeEventListener('keyup', this._handleKeyup);
-    this.hideUndo?.();
-    this.focusTrap?.deactivate();
+    this.removeEventListener('keyup', this.#handleKeyup);
+    this.#hideUndo?.();
+    this.#focusTrap?.deactivate();
     clearAllBodyScrollLocks();
   }
 

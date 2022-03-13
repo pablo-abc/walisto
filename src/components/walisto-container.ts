@@ -25,12 +25,12 @@ template.innerHTML = /* HTML */ `
 `;
 
 export class WalistoContainerElement extends HTMLElement {
-  get dl() {
+  get #dl() {
     return this.shadowRoot?.querySelector('dl') as HTMLDListElement;
   }
 
   get template() {
-    const template = this.dl
+    const template = this.#dl
       .querySelector('slot')!
       .assignedElements()
       .find((el) => el instanceof HTMLTemplateElement) as HTMLTemplateElement;
@@ -42,7 +42,7 @@ export class WalistoContainerElement extends HTMLElement {
     const content = document.importNode(template.content, true);
     this.shadowRoot?.appendChild(content);
     const dlContent = document.importNode(this.template.content, true);
-    this.dl.appendChild(dlContent);
+    this.#dl.appendChild(dlContent);
   }
 }
 

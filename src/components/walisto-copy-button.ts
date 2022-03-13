@@ -39,10 +39,10 @@ export class WalistoCopyButtonElement extends HTMLElement {
   @attr
   address = '';
 
-  copied = false;
+  #copied = false;
 
   private _renderContent() {
-    if (this.copied) {
+    if (this.#copied) {
       return /* HTML */ `
         <svg
           aria-hidden="true"
@@ -95,12 +95,12 @@ export class WalistoCopyButtonElement extends HTMLElement {
   copyAddress() {
     if (!this.address) return;
     navigator.clipboard.writeText(this.address);
-    this.copied = true;
+    this.#copied = true;
     this.walistoButton.classList.add('success');
     this.update();
     setTimeout(() => {
       this.walistoButton.classList.remove('success');
-      this.copied = false;
+      this.#copied = false;
       this.update();
     }, 500);
   }
