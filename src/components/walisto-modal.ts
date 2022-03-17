@@ -1,5 +1,5 @@
-import { controller, attr, target } from '@github/catalyst';
-import { AwesomeQR } from 'awesome-qr';
+import type { SlQrCode } from '@shoelace-style/shoelace';
+import { customElement, query, attribute } from './decorators';
 import {
   disableBodyScroll,
   enableBodyScroll,
@@ -9,6 +9,7 @@ import type { FocusTrap } from 'focus-trap';
 import { createFocusTrap } from 'focus-trap';
 import { hideOthers } from 'aria-hidden';
 
+import '@shoelace-style/shoelace/dist/components/qr-code/qr-code';
 import './walisto-button';
 
 const template = document.createElement('template');
@@ -50,16 +51,16 @@ template.innerHTML = /* HTML */ `
       max-width: 50rem;
     }
 
-    #content img {
-      max-width: 90vw;
-      max-height: 90vh;
-    }
-
     #content header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 0;
+    }
+
+    sl-qr-code::part(base) {
+      max-width: min(80vw, 80vh);
+      max-height: min(80vw, 80vh);
     }
 
     #content header h1 {
@@ -79,13 +80,7 @@ template.innerHTML = /* HTML */ `
       margin-left: -0.1rem;
     }
   </style>
-  <div
-    part="backdrop"
-    id="backdrop"
-    data-target="walisto-modal.backdrop"
-    role="presentation"
-    data-action="click:walisto-modal#closeFromBackdrop"
-  >
+  <div part="backdrop" id="backdrop" role="presentation">
     <div
       aria-labelledby="dialog-title"
       id="content"
@@ -94,17 +89,9 @@ template.innerHTML = /* HTML */ `
       part="content"
     >
       <header part="header">
-        <h1 part="title" id="dialog-title" data-target="walisto-modal.heading">
-          Address
-        </h1>
+        <h1 part="title" id="dialog-title">Address</h1>
         <walisto-button>
-          <button
-            part="button"
-            id="close-button"
-            type="button"
-            data-action="click:walisto-modal#close"
-            data-target="walisto-modal.button"
-          >
+          <button part="button" id="close-button" type="button">
             <svg
               fill="none"
               stroke="currentColor"
@@ -121,26 +108,33 @@ template.innerHTML = /* HTML */ `
           </button>
         </walisto-button>
       </header>
-      <img part="image" alt="QR Code" data-target="walisto-modal.image" />
+      <sl-qr-code size="254" value="" label="QR Code" />
     </div>
   </div>
 `;
 
-@controller
+@customElement('walisto-modal')
 export class WalistoModalElement extends HTMLElement {
-  @target backdrop!: HTMLDivElement;
+  @query('#backdrop')
+  backdrop!: HTMLDivElement;
 
-  @target heading!: HTMLHeadingElement;
+  @query('#dialog-title')
+  heading!: HTMLHeadingElement;
 
-  @target button!: HTMLButtonElement;
+  @query('#close-button')
+  button!: HTMLButtonElement;
 
-  @target image!: HTMLImageElement;
+  @query('sl-qr-code')
+  qrCode!: SlQrCode;
 
-  @attr address = '';
+  @attribute()
+  address = '';
 
-  @attr name = '';
+  @attribute()
+  name = '';
 
-  @attr closeLabel = '';
+  @attribute({ name: 'close-label' })
+  closeLabel = '';
 
   initialFocusRef?: HTMLElement | null;
 
@@ -193,14 +187,9 @@ export class WalistoModalElement extends HTMLElement {
     this.shadowRoot?.appendChild(content);
     this.update();
     if (!this.#focusTrap) this.#focusTrap = createFocusTrap(this.backdrop);
-    new AwesomeQR({
-      text: this.address,
-      size: 500,
-    })
-      .draw()
-      .then((dataUrl) => {
-        this.image.src = dataUrl?.toString() ?? '';
-      });
+    this.qrCode.value = this.address;
+    this.backdrop.addEventListener('click', this.closeFromBackdrop.bind(this));
+    this.button.addEventListener('click', this.close.bind(this));
   }
 
   disconnectedCallback() {

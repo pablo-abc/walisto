@@ -1,36 +1,26 @@
+import { customElement, attribute } from './decorators';
+
 import './walisto-copy-button';
 import './walisto-qr-button';
 
+@customElement('walisto-item')
 export class WalistoItemElement extends HTMLElement {
   [key: string]: unknown;
 
+  @attribute()
   name = '';
 
+  @attribute()
   address = '';
 
+  @attribute({ name: 'qr-label' })
   qrLabel = '';
 
+  @attribute({ name: 'copy-label' })
   copyLabel = '';
 
+  @attribute({ name: 'modal-close-label' })
   modalCloseLabel = '';
-
-  static get observedAttributes() {
-    return ['name', 'address', 'qr-label', 'copy-label', 'modal-close-label'];
-  }
-
-  static attributeMap: { [key: string]: string } = {
-    name: 'name',
-    address: 'address',
-    'qr-label': 'qrLabel',
-    'copy-label': 'copyLabel',
-    'modal-close-label': 'modalCloseLabel',
-  };
-
-  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    if (oldValue === newValue) return;
-    const attributeMap = WalistoItemElement.attributeMap;
-    this[attributeMap[name]] = newValue;
-  }
 
   inContainer?: boolean = false;
 
@@ -57,15 +47,15 @@ export class WalistoItemElement extends HTMLElement {
       <div id="buttons" part="buttons">
         <walisto-copy-button
           exportparts="button"
-          data-label="${this.copyLabel}"
-          data-address="${this.address}"
+          label="${this.copyLabel}"
+          address="${this.address}"
         ></walisto-copy-button>
         <walisto-qr-button
           exportparts="button"
-          data-address="${this.address}"
-          data-label="${this.qrLabel}"
-          data-name="${this.name}"
-          data-close-label="${this.modalCloseLabel}"
+          address="${this.address}"
+          label="${this.qrLabel}"
+          name="${this.name}"
+          close-label="${this.modalCloseLabel}"
         >
         </walisto-qr-button>
       </div>
@@ -147,8 +137,6 @@ export class WalistoItemElement extends HTMLElement {
     this.shadowRoot?.appendChild(content);
   }
 }
-
-customElements.define('walisto-item', WalistoItemElement);
 
 declare global {
   interface HTMLElementTagNameMap {

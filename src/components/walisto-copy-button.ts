@@ -1,4 +1,4 @@
-import { controller, attr, target } from '@github/catalyst';
+import { query, customElement, attribute } from './decorators';
 
 import './walisto-button';
 
@@ -14,29 +14,23 @@ template.innerHTML = /* HTML */ `
       height: 1.3rem;
     }
   </style>
-  <walisto-button data-target="walisto-copy-button.walistoButton">
-    <button
-      type="button"
-      data-action="click:walisto-copy-button#copyAddress"
-      id="copy-button"
-      part="button"
-      data-target="walisto-copy-button.button"
-    ></button>
+  <walisto-button>
+    <button type="button" id="copy-button" part="button"></button>
   </walisto-button>
 `;
 
-@controller
+@customElement('walisto-copy-button')
 export class WalistoCopyButtonElement extends HTMLElement {
-  @target
+  @query('walisto-button')
   walistoButton!: HTMLElement;
 
-  @target
+  @query('button')
   button!: HTMLButtonElement;
 
-  @attr
+  @attribute()
   label = '';
 
-  @attr
+  @attribute()
   address = '';
 
   #copied = false;
@@ -90,9 +84,10 @@ export class WalistoCopyButtonElement extends HTMLElement {
     const content = document.importNode(template.content, true);
     this.shadowRoot?.appendChild(content);
     this.update();
+    this.button.addEventListener('click', this.#copyAddress.bind(this));
   }
 
-  copyAddress() {
+  #copyAddress() {
     if (!this.address) return;
     navigator.clipboard.writeText(this.address);
     this.#copied = true;

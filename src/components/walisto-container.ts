@@ -1,3 +1,5 @@
+import { customElement, query } from './decorators';
+
 const template = document.createElement('template');
 
 template.innerHTML = /* HTML */ `
@@ -24,13 +26,13 @@ template.innerHTML = /* HTML */ `
   </dl>
 `;
 
+@customElement('walisto-container')
 export class WalistoContainerElement extends HTMLElement {
-  get #dl() {
-    return this.shadowRoot?.querySelector('dl') as HTMLDListElement;
-  }
+  @query('dl')
+  dl!: HTMLDListElement;
 
   get template() {
-    const template = this.#dl
+    const template = this.dl
       .querySelector('slot')!
       .assignedElements()
       .find((el) => el instanceof HTMLTemplateElement) as HTMLTemplateElement;
@@ -42,11 +44,9 @@ export class WalistoContainerElement extends HTMLElement {
     const content = document.importNode(template.content, true);
     this.shadowRoot?.appendChild(content);
     const dlContent = document.importNode(this.template.content, true);
-    this.#dl.appendChild(dlContent);
+    this.dl.appendChild(dlContent);
   }
 }
-
-customElements.define('walisto-container', WalistoContainerElement);
 
 declare global {
   interface HTMLElementTagNameMap {

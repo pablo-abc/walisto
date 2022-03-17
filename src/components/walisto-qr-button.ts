@@ -1,5 +1,5 @@
 import type { WalistoModalElement } from './walisto-modal';
-import { controller, attr, target } from '@github/catalyst';
+import { customElement, attribute, query } from './decorators';
 
 import './walisto-modal';
 import './walisto-button';
@@ -17,13 +17,7 @@ template.innerHTML = /* HTML */ `
     }
   </style>
   <walisto-button>
-    <button
-      part="button"
-      id="qr-button"
-      type="button"
-      data-action="click:walisto-qr-button#openModal"
-      data-target="walisto-qr-button.button"
-    >
+    <button part="button" id="qr-button" type="button">
       <svg
         aria-hidden="true"
         fill="none"
@@ -42,18 +36,19 @@ template.innerHTML = /* HTML */ `
   </walisto-button>
 `;
 
-@controller
+@customElement('walisto-qr-button')
 export class WalistoQrButtonElement extends HTMLElement {
-  @target
+  @query('button')
   button!: HTMLElement;
 
-  @attr label = '';
+  @attribute() label = '';
 
-  @attr name = '';
+  @attribute() name = '';
 
-  @attr address = '';
+  @attribute() address = '';
 
-  @attr closeLabel = '';
+  @attribute({ name: 'close-label' })
+  closeLabel = '';
 
   update() {
     const label = this.label || 'Show QR code';
@@ -71,11 +66,12 @@ export class WalistoQrButtonElement extends HTMLElement {
     if (!this.address || !this.name) return;
     if (this.modal) return;
     const modalElement = document.createElement('walisto-modal');
-    modalElement.setAttribute('data-address', this.address);
-    modalElement.setAttribute('data-name', this.name);
+    modalElement.setAttribute('address', this.address);
+    modalElement.setAttribute('name', this.name);
     if (this.closeLabel) modalElement.closeLabel = this.closeLabel;
     document.body.appendChild(modalElement);
     this.modal = modalElement;
+    this.button.addEventListener('click', this.openModal.bind(this));
   }
 
   openModal() {
