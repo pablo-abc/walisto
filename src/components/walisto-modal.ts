@@ -1,15 +1,8 @@
-import type { SlQrCode } from '@shoelace-style/shoelace';
+import type { SlQrCode, SlDialog } from '@shoelace-style/shoelace';
 import { customElement, query, attribute } from './decorators';
-import {
-  disableBodyScroll,
-  enableBodyScroll,
-  clearAllBodyScrollLocks,
-} from 'body-scroll-lock';
-import type { FocusTrap } from 'focus-trap';
-import { createFocusTrap } from 'focus-trap';
-import { hideOthers } from 'aria-hidden';
 
 import '@shoelace-style/shoelace/dist/components/qr-code/qr-code';
+import '@shoelace-style/shoelace/dist/components/dialog/dialog';
 import './walisto-button';
 
 const template = document.createElement('template');
@@ -29,41 +22,34 @@ template.innerHTML = /* HTML */ `
       display: block;
     }
 
-    #backdrop {
-      position: fixed;
-      display: none;
-      place-items: center;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
+    sl-dialog::part(overlay) {
       background: var(--walisto-modal-backdrop-bg);
-      overflow: auto;
     }
 
-    #content {
+    sl-dialog::part(panel) {
+      width: auto;
       display: block;
       background: var(--walisto-modal-bg);
-      padding: 1rem;
       border-radius: 10px;
       color: var(--walisto-modal-font-color);
       font-family: var(--walisto-modal-font-family);
       max-width: 50rem;
     }
 
-    #content header {
+    sl-dialog header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 0;
+      padding: 1rem;
     }
 
     sl-qr-code::part(base) {
       max-width: min(80vw, 80vh);
       max-height: min(80vw, 80vh);
+      margin: 1rem;
     }
 
-    #content header h1 {
+    sl-dialog header h1 {
       margin: 0;
     }
 
@@ -80,44 +66,33 @@ template.innerHTML = /* HTML */ `
       margin-left: -0.1rem;
     }
   </style>
-  <div part="backdrop" id="backdrop" role="presentation">
-    <div
-      aria-labelledby="dialog-title"
-      id="content"
-      aria-modal="true"
-      role="dialog"
-      part="content"
-    >
-      <header part="header">
-        <h1 part="title" id="dialog-title">Address</h1>
-        <walisto-button>
-          <button part="button" id="close-button" type="button">
-            <svg
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
-            </svg>
-          </button>
-        </walisto-button>
-      </header>
-      <sl-qr-code size="254" value="" label="QR Code" />
-    </div>
-  </div>
+  <sl-dialog part="dialog" no-header label="Address">
+    <header part="header">
+      <h1 part="title" id="dialog-title">Address</h1>
+      <walisto-button>
+        <button part="button" id="close-button" type="button">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </walisto-button>
+    </header>
+    <sl-qr-code size="254" value="" label="QR Code" />
+  </sl-dialog>
 `;
 
 @customElement('walisto-modal')
 export class WalistoModalElement extends HTMLElement {
-  @query('#backdrop')
-  backdrop!: HTMLDivElement;
-
   @query('#dialog-title')
   heading!: HTMLHeadingElement;
 
@@ -126,6 +101,9 @@ export class WalistoModalElement extends HTMLElement {
 
   @query('sl-qr-code')
   qrCode!: SlQrCode;
+
+  @query('sl-dialog')
+  dialog!: SlDialog;
 
   @attribute()
   address = '';
@@ -140,69 +118,38 @@ export class WalistoModalElement extends HTMLElement {
 
   open() {
     this.isOpen = true;
-    this.backdrop.style.display = 'grid';
-    document.addEventListener('keyup', this.#handleKeyup);
-    this.#focusTrap?.activate();
-    this.#hideUndo = hideOthers(this);
-    disableBodyScroll(this.backdrop);
+    this.dialog.show();
   }
 
   close() {
     this.isOpen = false;
-    this.#focusTrap?.deactivate();
-    this.backdrop.style.display = 'none';
-    document.removeEventListener('keyup', this.#handleKeyup);
-    enableBodyScroll(this.backdrop);
-    this.#hideUndo?.();
-    const initialFocusRef = this.initialFocusRef;
-    if (initialFocusRef) {
-      requestAnimationFrame(() => {
-        initialFocusRef.focus();
-        initialFocusRef.scrollIntoView();
-      });
-    }
+    this.dialog.hide();
+    requestAnimationFrame(() => {
+      this.initialFocusRef?.focus();
+    });
   }
 
   isOpen = false;
 
-  #focusTrap?: FocusTrap;
-
-  #hideUndo?: () => void;
-
-  #handleKeyup = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      this.close();
-    }
-  };
-
-  closeFromBackdrop(e: MouseEvent) {
-    const target = e.target as HTMLDivElement;
-    if (target === this.backdrop) this.close();
-  }
-
   connectedCallback() {
     this.attachShadow({ mode: 'open' });
     const content = document.importNode(template.content, true);
-    this.shadowRoot?.appendChild(content);
+    this.shadowRoot!.appendChild(content);
     this.update();
-    if (!this.#focusTrap) this.#focusTrap = createFocusTrap(this.backdrop);
     this.qrCode.value = this.address;
-    this.backdrop.addEventListener('click', this.closeFromBackdrop.bind(this));
     this.button.addEventListener('click', this.close.bind(this));
   }
 
   disconnectedCallback() {
     this.close();
-    this.removeEventListener('keyup', this.#handleKeyup);
-    this.#hideUndo?.();
-    this.#focusTrap?.deactivate();
-    clearAllBodyScrollLocks();
   }
 
   update() {
     const label = this.closeLabel || 'Close';
-    if (this.name) this.heading.textContent = this.name;
+    if (this.name) {
+      this.heading.textContent = this.name;
+      this.dialog.label = this.name;
+    }
     this.button.setAttribute('aria-label', label);
     this.button.setAttribute('title', label);
   }
