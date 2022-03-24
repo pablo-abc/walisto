@@ -149,7 +149,7 @@ export function customElement<T extends CustomElement>(name: string) {
                 ? this[`before${capitalized}Change`]!(oldValue, value)
                 : value;
               descriptor?.set?.(value);
-              this[`after${capitalized}Changed`]?.(oldValue, value);
+              this[`after${capitalized}Change`]?.(oldValue, value);
             },
             get() {
               if (descriptor?.get) return descriptor.get();

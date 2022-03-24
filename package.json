@@ -1,6 +1,6 @@
 {
   "name": "walisto",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A widget to display crypto addresses",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -35,7 +35,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@shoelace-style/shoelace": "^2.0.0-beta.71"
+    "@shoelace-style/shoelace": "^2.0.0-beta.72"
   },
   "exports": {
     ".": "./dist/index.js",

@@ -58,8 +58,13 @@ export class WalistoQrButtonElement extends HTMLElement {
 
   modal?: WalistoModalElement;
 
-  connectedCallback() {
+  constructor() {
+    super();
     this.attachShadow({ mode: 'open' });
+    this.openModal = this.openModal.bind(this);
+  }
+
+  connectedCallback() {
     const content = document.importNode(template.content, true);
     this.shadowRoot?.appendChild(content);
     this.update();
@@ -71,7 +76,11 @@ export class WalistoQrButtonElement extends HTMLElement {
     if (this.closeLabel) modalElement.closeLabel = this.closeLabel;
     document.body.appendChild(modalElement);
     this.modal = modalElement;
-    this.button.addEventListener('click', this.openModal.bind(this));
+    this.button.addEventListener('click', this.openModal);
+  }
+
+  disconnectedCallback() {
+    this.button.removeEventListener('click', this.openModal);
   }
 
   openModal() {

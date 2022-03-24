@@ -79,15 +79,23 @@ export class WalistoCopyButtonElement extends HTMLElement {
     this.button.innerHTML = this._renderContent();
   }
 
-  connectedCallback() {
+  constructor() {
+    super();
     this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
     const content = document.importNode(template.content, true);
     this.shadowRoot?.appendChild(content);
     this.update();
-    this.button.addEventListener('click', this.#copyAddress.bind(this));
+    this.button.addEventListener('click', this.#copyAddress);
   }
 
-  #copyAddress() {
+  disconnectedCallback() {
+    this.button.removeEventListener('click', this.#copyAddress);
+  }
+
+  #copyAddress = () => {
     if (!this.address) return;
     navigator.clipboard.writeText(this.address);
     this.#copied = true;
@@ -98,5 +106,5 @@ export class WalistoCopyButtonElement extends HTMLElement {
       this.#copied = false;
       this.update();
     }, 500);
-  }
+  };
 }

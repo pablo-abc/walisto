@@ -131,17 +131,24 @@ export class WalistoModalElement extends HTMLElement {
 
   isOpen = false;
 
-  connectedCallback() {
+  constructor() {
+    super();
     this.attachShadow({ mode: 'open' });
+    this.close = this.close.bind(this);
+    this.open = this.open.bind(this);
+  }
+
+  connectedCallback() {
     const content = document.importNode(template.content, true);
     this.shadowRoot!.appendChild(content);
     this.update();
     this.qrCode.value = this.address;
-    this.button.addEventListener('click', this.close.bind(this));
+    this.button.addEventListener('click', this.close);
   }
 
   disconnectedCallback() {
     this.close();
+    this.button.removeEventListener('click', this.close);
   }
 
   update() {
